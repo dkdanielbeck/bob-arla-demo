@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Tools — A Guide</title>
+<style>
+  :root {
+    --bg:     #f7f8fc;
+    --white:  #ffffff;
+    --ink:    #0d0f1a;
+    --ink2:   #454960;
+    --border: #e2e5f0;
+    --accent: #2c54e8;
+    --green:  #059669;
+    --amber:  #d97706;
+    --ibm:    #0f62fe;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.6;
+    padding-top: 52px;
+  }
+
+  /* ── logo images — universal helper ── */
+  .logo-img {
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
+  }
+
+  /* ── NAV ── */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; height: 52px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    z-index: 300;
+    display: flex; align-items: center;
+    padding: 0 32px; gap: 4px;
+    overflow-x: auto;
+  }
+  .nav .logo { font-weight: 800; font-size: 14px; color: var(--accent); margin-right: 16px; white-space: nowrap; flex-shrink: 0; }
+  .nav a {
+    font-size: 12.5px; font-weight: 500; color: var(--ink2);
+    text-decoration: none; padding: 5px 12px; border-radius: 6px;
+    white-space: nowrap; transition: all 0.15s; flex-shrink: 0;
+  }
+  .nav a:hover { background: var(--bg); color: var(--ink); }
+
+  /* ── TITLE SLIDE — isolated, no nth-child interference ── */
+  .slide-title {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 72px 80px;
+    background: #0d1033 !important;
+    background-image: radial-gradient(ellipse at 60% 40%, #1e3a8a 0%, transparent 60%),
+                      radial-gradient(ellipse at 20% 80%, #312e81 0%, transparent 50%) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    position: relative;
+    overflow: hidden;
+  }
+  .slide-title::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      -45deg, transparent, transparent 80px,
+      rgba(255,255,255,0.015) 80px, rgba(255,255,255,0.015) 81px
+    );
+    pointer-events: none;
+  }
+  .slide-title .eyebrow { color: #8ba0ff; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 14px; }
+  .slide-title h1 {
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 900; letter-spacing: -0.035em;
+    line-height: 1.0; color: #ffffff;
+    margin-bottom: 20px; max-width: 760px;
+  }
+  .slide-title h1 em { font-style: normal; color: #8ba0ff; }
+  .slide-title .lead { font-size: 1.15rem; color: #94a3b8; margin-bottom: 48px; max-width: 520px; line-height: 1.6; }
+
+  /* logo groups on title */
+  .title-groups {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start;
+  }
+  .tl-group {
+    display: flex; flex-direction: column; gap: 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 14px 18px 16px;
+  }
+  .tl-group.ibm-group {
+    background: rgba(15,98,254,0.18);
+    border-color: rgba(15,98,254,0.4);
+  }
+  .tl-cat {
+    font-size: 9px; font-weight: 800; letter-spacing: 0.18em;
+    text-transform: uppercase; color: rgba(255,255,255,0.4);
+  }
+  .tl-pills { display: flex; flex-wrap: wrap; gap: 7px; }
+  .tl-pill {
+    display: flex; align-items: center; gap: 7px;
+    background: rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 40px; padding: 5px 12px 5px 6px;
+    transition: background 0.15s;
+  }
+  .tl-pill:hover { background: rgba(255,255,255,0.16); }
+  .tl-pill.ibm { background: #0f62fe; border-color: #0f62fe; }
+  .tl-pill .logo-img { width: 20px; height: 20px; border-radius: 4px; }
+  .tl-pill span { font-size: 12px; font-weight: 600; color: #e2e8f0; white-space: nowrap; }
+  .tl-pill.ibm span { color: #ffffff; }
+
+  /* ── REGULAR SLIDES ── */
+  .slide {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 72px 80px;
+    border-bottom: 1px solid var(--border);
+    background: var(--white);
+  }
+  .slide.alt { background: var(--bg); }
+  .slide:last-child { border-bottom: none; }
+
+  .eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .slide h2 { font-size: clamp(2rem, 3.5vw, 2.8rem); font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; color: var(--ink); margin-bottom: 10px; }
+  .slide .lead { font-size: 1.05rem; color: var(--ink2); max-width: 680px; margin-bottom: 44px; line-height: 1.6; }
+
+  /* ── FOUR QUADRANTS ── */
+  .quadrants { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; min-height: 460px; }
+  .quad {
+    border-radius: 16px; border: 2px solid transparent;
+    padding: 28px 32px; display: flex; flex-direction: column;
+    transition: border-color 0.2s;
+  }
+  .quad:hover { border-color: currentColor; }
+  .quad .q-num { font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 8px; opacity: 0.65; }
+  .quad h3 { font-size: 1.25rem; font-weight: 800; line-height: 1.2; margin-bottom: 8px; }
+  .quad .q-desc { font-size: 13.5px; line-height: 1.55; flex: 1; opacity: 0.85; }
+  .quad .q-logos { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .q-logo-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.7); border: 1px solid rgba(0,0,0,0.07);
+    border-radius: 20px; padding: 4px 11px 4px 6px;
+    font-size: 11.5px; font-weight: 600;
+  }
+  .q-logo-chip.ibm {
+    background: #0f62fe; border-color: #0f62fe; color: #ffffff;
+  }
+  .q-logo-chip .logo-img { width: 16px; height: 16px; border-radius: 3px; }
+
+  .quad-blue   { background: #eff4ff; color: #1e40af; }
+  .quad-purple { background: #f5f3ff; color: #6d28d9; }
+  .quad-teal   { background: #f0fdfa; color: #0f766e; }
+  .quad-amber  { background: #fffbeb; color: #92400e; }
+
+  /* ── TOOL CARDS ── */
+  .tool-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .tc {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 24px 22px 20px;
+    display: flex; flex-direction: column;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s, transform 0.15s;
+  }
+  .tc:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.09); transform: translateY(-2px); }
+  .tc-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .tc-logo {
+    width: 44px; height: 44px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; background: var(--bg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .tc-logo .logo-img { width: 28px; height: 28px; }
+  .tc-name { font-size: 1rem; font-weight: 800; line-height: 1.2; color: var(--ink); }
+  .tc-maker { font-size: 11px; color: var(--ink2); margin-top: 2px; }
+  .tc-badge {
+    margin-left: auto; font-size: 10px; font-weight: 700;
+    padding: 3px 8px; border-radius: 7px; letter-spacing: 0.03em; white-space: nowrap;
+  }
+  .b-chat   { background: #dbeafe; color: #1e3a8a; }
+  .b-dev    { background: #ede9fe; color: #4c1d95; }
+  .b-ide    { background: #d1fae5; color: #064e3b; }
+  .b-ent    { background: #fef3c7; color: #78350f; }
+  .b-ibm    { background: #dbeafe; color: #0f62fe; }
+  .tc-tagline { font-size: 14.5px; font-weight: 700; color: var(--ink); margin-bottom: 6px; line-height: 1.3; }
+  .tc-desc { font-size: 13px; color: var(--ink2); line-height: 1.6; flex: 1; }
+  .tc-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 14px; }
+  .chip { font-size: 11px; padding: 2px 9px; border-radius: 6px; border: 1px solid var(--border); color: var(--ink2); background: var(--bg); }
+
+  /* ── IBM BANNER ── */
+  .ibm-banner {
+    background: linear-gradient(135deg, #eff4ff, #f5f3ff);
+    border: 1.5px solid #c7d7fd; border-radius: 14px;
+    padding: 18px 22px; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .ibm-banner svg { width: 28px; height: 28px; flex-shrink: 0; }
+  .ibm-banner p { font-size: 13.5px; color: var(--ink2); }
+  .ibm-banner strong { color: var(--accent); }
+
+  /* ── MATRIX ── */
+  .matrix-wrap { overflow-x: auto; border-radius: 14px; border: 1.5px solid var(--border); }
+  table.mx { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--white); }
+  table.mx thead th {
+    background: var(--ink); color: #fff;
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 13px 14px; text-align: left; white-space: nowrap;
+  }
+  table.mx thead th:first-child { border-radius: 12px 0 0 0; }
+  table.mx thead th:last-child  { border-radius: 0 12px 0 0; }
+  table.mx tbody tr:hover td { background: #f8f9ff; }
+  table.mx tbody td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  table.mx tbody tr:last-child td { border-bottom: none; }
+  .mx-tool { display: flex; align-items: center; gap: 9px; }
+  .mx-logo {
+    width: 28px; height: 28px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg); border: 1px solid var(--border); flex-shrink: 0;
+    overflow: hidden;
+  }
+  .mx-logo .logo-img { width: 18px; height: 18px; }
+  .mx-name { font-weight: 700; font-size: 13.5px; white-space: nowrap; }
+  .mx-vendor { font-size: 11px; color: var(--ink2); }
+  .yes  { color: var(--green);  font-size: 18px; font-weight: 800; text-align: center; }
+  .part { color: var(--amber);  font-size: 13px; font-weight: 700; text-align: center; }
+  .no   { color: #cbd5e1; font-size: 18px; text-align: center; }
+  .ibm-row td { background: #edf3ff !important; }
+  .ibm-row:hover td { background: #d0e2ff !important; }
+
+  /* ── DECISION GUIDE ── */
+  .dg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .dg-row { display: flex; align-items: stretch; background: var(--white); border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .dg-if {
+    background: var(--bg); padding: 16px 18px;
+    font-size: 13.5px; font-weight: 600; color: var(--ink);
+    min-width: 200px; max-width: 220px; flex-shrink: 0;
+    display: flex; align-items: center; border-right: 1.5px solid var(--border); line-height: 1.4;
+  }
+  .dg-then { padding: 16px 18px; font-size: 13px; color: var(--ink2); display: flex; align-items: center; line-height: 1.5; gap: 8px; flex-wrap: wrap; }
+  .dg-then strong { color: var(--ink); }
+  .dg-logo {
+    width: 22px; height: 22px; border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg); border: 1px solid var(--border); flex-shrink: 0;
+    overflow: hidden;
+  }
+  .dg-logo .logo-img { width: 14px; height: 14px; }
+
+  /* ── SUMMARY ── */
+  .sum-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(185px, 1fr)); gap: 10px; }
+  .sum-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 18px 16px;
+    display: flex; flex-direction: column; align-items: flex-start;
+    transition: box-shadow 0.15s;
+  }
+  .sum-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+  .sum-card.ibm { border-color: #0f62fe; background: #edf3ff; }
+  .sum-logo {
+    width: 36px; height: 36px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg); border: 1px solid var(--border); margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .sum-logo .logo-img { width: 24px; height: 24px; }
+  .sum-name { font-size: 12.5px; font-weight: 800; color: var(--ink); margin-bottom: 4px; }
+  .sum-line { font-size: 12px; color: var(--ink2); line-height: 1.45; }
+
+  /* ── CALLOUT ── */
+  .callout { background: #eff4ff; border: 1.5px solid #c7d7fd; border-radius: 12px; padding: 16px 20px; font-size: 13.5px; color: #1e3a8a; line-height: 1.6; margin-top: 24px; }
+  .callout strong { color: var(--accent); }
+
+  .section-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink2); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .section-label::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+  .ms-feature { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px; }
+  .ms-feature-icon { font-size: 20px; flex-shrink: 0; line-height: 1.4; }
+  .ms-feature-text { font-size: 13.5px; color: var(--ink2); line-height: 1.5; }
+  .ms-feature-text strong { color: var(--ink); }
+
+  /* ── RESPONSIVE DESIGN ── */
+  @media (max-width: 1024px) {
+    .slide, .slide-title { padding: 64px 40px; }
+  }
+
+  @media (max-width: 800px) {
+    body { padding-top: 48px; }
+    .nav { height: 48px; padding: 0 16px; gap: 2px; }
+    .nav .logo { margin-right: 10px; font-size: 13px; }
+    .nav a { font-size: 12px; padding: 4px 9px; }
+
+    .slide, .slide-title { padding: 48px 20px; min-height: auto; }
+    .quadrants, .dg-grid { grid-template-columns: 1fr; }
+    .tool-row { grid-template-columns: 1fr; }
+    .sum-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+
+    .slide-title h1 { font-size: clamp(2.4rem, 8vw, 3.5rem); }
+    .slide-title .lead { margin-bottom: 32px; font-size: 1.05rem; }
+    .slide h2 { font-size: clamp(1.75rem, 5vw, 2.2rem); }
+    .slide .lead { margin-bottom: 28px; }
+
+    .dg-row { flex-direction: column; }
+    .dg-if {
+      min-width: 0; max-width: 100%; width: 100%;
+      border-right: none; border-bottom: 1.5px solid var(--border);
+      padding: 12px 16px;
+    }
+    .dg-then { padding: 12px 16px; }
+
+    .ibm-feature-box { padding: 20px 18px !important; }
+    .ibm-feature-inner { gap: 24px !important; }
+    .bob-identity { width: 100% !important; }
+    .bob-diff-grid { grid-template-columns: 1fr !important; gap: 14px !important; }
+
+    .slide-split { gap: 28px !important; }
+  }
+
+  @media (max-width: 480px) {
+    .slide, .slide-title { padding: 40px 16px; }
+    .title-groups { gap: 10px; }
+    .tl-group { padding: 12px 14px; width: 100%; }
+    .tl-pill { padding: 4px 10px 4px 5px; }
+    .tl-pill span { font-size: 11.5px; }
+    .quad { padding: 20px 18px; }
+    .sum-grid { grid-template-columns: 1fr; }
+    .ibm-banner { padding: 14px 16px; }
+  }
+  /* ── QUICK LINKS SECTION ── */
+  .ql-box {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    position: relative;
+    max-width: 760px;
+  }
+  .ql-textarea {
+    width: 100%;
+    font-family: "SF Mono", "Fira Code", "Consolas", monospace;
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--ink);
+    background: transparent;
+    border: none;
+    resize: none;
+    outline: none;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .ql-copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    padding: 7px 18px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .ql-copy-btn:hover { background: #1a3fd4; }
+  .ql-copy-btn:active { transform: scale(0.97); }
+  .ql-copy-btn.copied { background: var(--green); }
+  .ql-divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+  /* ── IBM tool link wrapper ── */
+  a.ibm-tool-link {
+    text-decoration: none;
+    color: inherit;
+    display: contents;
+  }
+  a.ibm-tool-link-block {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  a.ibm-tool-link-flex {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: inherit;
+  }
+  .tl-pill a.ibm-tool-link, a.ibm-tool-link .tl-pill { pointer-events: auto; }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <span class="logo">AI Tools Guide</span>
+  <a href="#s0">Intro</a>
+  <a href="#s1">3 Types</a>
+  <a href="#s2">Chat AI</a>
+  <a href="#s3">Coding Agents</a>
+  <a href="#s4">IBM Tools</a>
+  <a href="#s5">Enterprise</a>
+  <a href="#s6">Matrix</a>
+  <a href="#s7">When to Use</a>
+  <a href="#s8">Summary</a>
+  <a href="#s9">How I Made This</a>
+  <a href="#s10">GitHub Pages</a>
+  <a href="#s11">Key Links</a>
+</nav>
+
+
+<!-- ════════════  TITLE  ════════════ -->
+<section class="slide-title" id="s0">
+  <div class="eyebrow">IBM Consulting · AI Enablement</div>
+  <h1>Understanding<br><em>AI Tools</em></h1>
+  <p class="lead">10 tools. 4 categories. One clear picture of when to use what.</p>
+
+  <div class="title-groups">
+
+    <!-- Chat Assistants -->
+    <div class="tl-group">
+      <div class="tl-cat">Chat Assistants</div>
+      <div class="tl-pills">
+        <div class="tl-pill">
+          <img class="logo-img" src="logos/gemini.png" alt="Gemini">
+          <span>Google Gemini</span>
+        </div>
+        <div class="tl-pill">
+          <img class="logo-img" src="logos/chatgpt.svg" alt="ChatGPT">
+          <span>ChatGPT</span>
+        </div>
+        <div class="tl-pill">
+          <img class="logo-img" src="logos/claude.webp" alt="Claude">
+          <span>Claude</span>
+        </div>
+        <div class="tl-pill">
+          <img class="logo-img" src="logos/Copilot.png" alt="Copilot">
+          <span>Copilot</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coding Agents — includes IBM Bob -->
+    <div class="tl-group">
+      <div class="tl-cat">Coding Agents</div>
+      <div class="tl-pills">
+        <div class="tl-pill">
+          <img class="logo-img" src="logos/antigravity.png" alt="Antigravity">
+          <span>Antigravity</span>
+        </div>
+        <div class="tl-pill">
+          <img class="logo-img" src="logos/codex.webp" alt="Codex">
+          <span>Codex</span>
+        </div>
+        <div class="tl-pill">
+          <img class="logo-img" src="logos/claude code.png" alt="Claude Code">
+          <span>Claude Code</span>
+        </div>
+        <div class="tl-pill">
+          <img class="logo-img" src="logos/cursor.svg" alt="Cursor">
+          <span>Cursor</span>
+        </div>
+        <a href="https://bob.ibm.com/" target="_blank" rel="noopener" class="tl-pill ibm" style="text-decoration:none;">
+          <img class="logo-img" src="logos/bob.png" alt="IBM Bob">
+          <span>IBM Bob</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- IBM Consulting Tools — Bob, ICA, ICA Edge -->
+    <div class="tl-group">
+      <div class="tl-cat">IBM Consulting Tools</div>
+      <div class="tl-pills">
+        <a href="https://bob.ibm.com/" target="_blank" rel="noopener" class="tl-pill ibm" style="text-decoration:none;">
+          <img class="logo-img" src="logos/bob.png" alt="IBM Bob">
+          <span>IBM Bob</span>
+        </a>
+        <a href="https://servicesessentials.ibm.com/launchpad/" target="_blank" rel="noopener" class="tl-pill ibm" style="text-decoration:none;">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:rgba(255,255,255,0.25);border-radius:4px;font-size:7px;font-weight:900;color:#ffffff;letter-spacing:0.02em;">ICA</span>
+          <span>IBM ICA</span>
+        </a>
+        <a href="https://pages.github.ibm.com/ica-cowork-artifacts/roi-zahut/artifacts/art_4e7985ab.html#overview" target="_blank" rel="noopener" class="tl-pill ibm" style="text-decoration:none;">
+          <img class="logo-img" src="logos/ICA edge.png" alt="ICA Edge">
+          <span>ICA Edge</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Enterprise Platforms — Copilot, Gemini, ICA, ICA Edge -->
+    <div class="tl-group">
+      <div class="tl-cat">Enterprise Platforms</div>
+      <div class="tl-pills">
+        <div class="tl-pill">
+          <img class="logo-img" src="logos/Copilot.png" alt="Copilot">
+          <span>Copilot</span>
+        </div>
+        <div class="tl-pill">
+          <img class="logo-img" src="logos/gemini.png" alt="Gemini">
+          <span>Google Gemini</span>
+        </div>
+        <a href="https://servicesessentials.ibm.com/launchpad/" target="_blank" rel="noopener" class="tl-pill ibm" style="text-decoration:none;">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;background:rgba(255,255,255,0.25);border-radius:4px;font-size:7px;font-weight:900;color:#ffffff;letter-spacing:0.02em;">ICA</span>
+          <span>IBM ICA</span>
+        </a>
+        <a href="https://pages.github.ibm.com/ica-cowork-artifacts/roi-zahut/artifacts/art_4e7985ab.html#overview" target="_blank" rel="noopener" class="tl-pill ibm" style="text-decoration:none;">
+          <img class="logo-img" src="logos/ICA edge.png" alt="ICA Edge">
+          <span>ICA Edge</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ════════════  3 TYPES  ════════════ -->
+<section class="slide alt" id="s1">
+  <div class="eyebrow">The Big Picture</div>
+  <h2>3 Types of AI Tool</h2>
+  <p class="lead">Every tool belongs to one of three archetypes. Knowing the type tells you 80% of what you need.</p>
+
+  <!-- Three type quads -->
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:20px;">
+
+    <div class="quad quad-blue" style="min-height:0;">
+      <div class="q-num">① Type One</div>
+      <h3>Chat Assistants</h3>
+      <p class="q-desc">Conversational AI you talk to. Best for writing, research, and brainstorming. You guide it — it produces.</p>
+      <div class="q-logos">
+        <div class="q-logo-chip"><img class="logo-img" src="logos/gemini.png" alt="Gemini">Gemini</div>
+        <div class="q-logo-chip"><img class="logo-img" src="logos/chatgpt.svg" alt="ChatGPT">ChatGPT</div>
+        <div class="q-logo-chip"><img class="logo-img" src="logos/claude.webp" alt="Claude">Claude</div>
+        <div class="q-logo-chip"><img class="logo-img" src="logos/Copilot.png" alt="Copilot">Copilot</div>
+      </div>
+    </div>
+
+    <div class="quad quad-purple" style="min-height:0;">
+      <div class="q-num">② Type Two</div>
+      <h3>Coding Agents</h3>
+      <p class="q-desc">AI that writes, tests, and fixes code autonomously across an entire codebase. Lives in your terminal or IDE.</p>
+      <div class="q-logos">
+        <div class="q-logo-chip"><img class="logo-img" src="logos/antigravity.png" alt="Antigravity">Antigravity</div>
+        <div class="q-logo-chip"><img class="logo-img" src="logos/codex.webp" alt="Codex">Codex</div>
+        <div class="q-logo-chip"><img class="logo-img" src="logos/claude code.png" alt="Claude Code">Claude Code</div>
+        <div class="q-logo-chip"><img class="logo-img" src="logos/cursor.svg" alt="Cursor">Cursor</div>
+      </div>
+    </div>
+
+    <div class="quad quad-amber" style="min-height:0;">
+      <div class="q-num">③ Type Three</div>
+      <h3>Enterprise Platforms</h3>
+      <p class="q-desc">AI woven into the tools your organisation already uses — emails, docs, spreadsheets, meetings.</p>
+      <div class="q-logos">
+        <div class="q-logo-chip"><img class="logo-img" src="logos/Copilot.png" alt="Microsoft Copilot">Microsoft Copilot</div>
+        <div class="q-logo-chip"><img class="logo-img" src="logos/gemini.png" alt="Gemini">Gemini</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- IBM Consulting Tools banner — full width -->
+  <div style="background:linear-gradient(135deg,#0d1a4a 0%,#0f3577 60%,#1a237e 100%); border-radius:16px; padding:28px 32px; display:flex; flex-wrap:wrap; gap:28px; align-items:center;">
+
+    <div style="flex:1; min-width:240px;">
+      <div style="font-size:10px; font-weight:800; letter-spacing:0.16em; text-transform:uppercase; color:rgba(255,255,255,0.5); margin-bottom:8px;">IBM Consulting</div>
+      <div style="font-size:1.15rem; font-weight:800; color:#ffffff; line-height:1.3; margin-bottom:8px;">IBM's tools span all three types</div>
+      <p style="font-size:13px; color:rgba(255,255,255,0.65); line-height:1.6; max-width:480px;">IBM Bob, IBM ICA 2.0, and ICA Edge aren't a separate category — they're IBM's governed, enterprise-approved entries <em>within</em> the three types above.</p>
+    </div>
+
+    <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:stretch;">
+
+      <!-- IBM Bob -->
+      <a href="https://bob.ibm.com/" target="_blank" rel="noopener" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); border-radius:12px; padding:16px 20px; min-width:160px; text-decoration:none; display:block; transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+            <img class="logo-img" src="logos/bob.png" alt="IBM Bob" style="width:22px;height:22px;">
+          </div>
+          <span style="font-size:14px; font-weight:800; color:#ffffff;">IBM Bob</span>
+        </div>
+        <div style="font-size:11.5px; color:rgba(255,255,255,0.55); line-height:1.5;">Coding Agent</div>
+        <div style="font-size:11.5px; color:rgba(255,255,255,0.55); line-height:1.5;">IBM-approved for internal codebases</div>
+      </a>
+
+      <!-- IBM ICA 2.0 -->
+      <a href="https://servicesessentials.ibm.com/launchpad/" target="_blank" rel="noopener" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); border-radius:12px; padding:16px 20px; min-width:160px; text-decoration:none; display:block; transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <span style="font-size:8px;font-weight:900;color:#ffffff;letter-spacing:0.04em;">ICA</span>
+          </div>
+          <span style="font-size:14px; font-weight:800; color:#ffffff;">IBM ICA 2.0</span>
+        </div>
+        <div style="font-size:11.5px; color:rgba(255,255,255,0.55); line-height:1.5;">Chat Assistant + Enterprise Platform</div>
+        <div style="font-size:11.5px; color:rgba(255,255,255,0.55); line-height:1.5;">Governed AI for consulting delivery</div>
+      </a>
+
+      <!-- ICA Edge -->
+      <a href="https://pages.github.ibm.com/ica-cowork-artifacts/roi-zahut/artifacts/art_4e7985ab.html#overview" target="_blank" rel="noopener" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.16); border-radius:12px; padding:16px 20px; min-width:160px; text-decoration:none; display:block; transition:background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+            <img class="logo-img" src="logos/ICA edge.png" alt="ICA Edge" style="width:22px;height:22px;">
+          </div>
+          <span style="font-size:14px; font-weight:800; color:#ffffff;">ICA Edge</span>
+        </div>
+        <div style="font-size:11.5px; color:rgba(255,255,255,0.55); line-height:1.5;">Coding Agent + Enterprise Platform</div>
+        <div style="font-size:11.5px; color:rgba(255,255,255,0.55); line-height:1.5;">On-device — data never leaves your laptop</div>
+      </a>
+
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ════════════  CHAT AI  ════════════ -->
+<section class="slide" id="s2">
+  <div class="eyebrow">Type One — Chat Assistants</div>
+  <h2>Chat AI</h2>
+
+  <div class="slide-split" style="display:flex; gap:60px; align-items:flex-start; flex-wrap:wrap;">
+
+    <!-- Description column -->
+    <div style="flex:1; min-width:280px; max-width:520px;">
+      <p style="font-size:1.05rem; color:var(--ink2); line-height:1.75; margin-bottom:20px;">
+        You bring a question, document, or task. They bring broad, general knowledge and the ability to reason, write, summarise, and research. Best used conversationally — you steer, they produce.
+      </p>
+      <p style="font-size:1.05rem; color:var(--ink2); line-height:1.75; margin-bottom:20px;">
+        The right tool depends on your ecosystem. Gemini slots naturally into Google Workspace; Copilot into Microsoft 365. ChatGPT and Claude are standalone assistants with no ecosystem dependency — pick whichever fits your workflow.
+      </p>
+      <p style="font-size:1.05rem; color:var(--ink2); line-height:1.75;">
+        Use Chat AI for writing, research, brainstorming, summarising documents, drafting emails, and explaining complex topics. These tools are not connected to your codebase or internal systems unless explicitly configured.
+      </p>
+    </div>
+
+    <!-- Logo list column -->
+    <div style="flex:0 0 auto; display:flex; flex-direction:column; gap:12px; padding-top:4px;">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div class="tc-logo" style="width:48px;height:48px;border-radius:12px;">
+          <img class="logo-img" src="logos/gemini.png" alt="Gemini" style="width:30px;height:30px;">
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--ink);">Google Gemini</div>
+          <div style="font-size:12px;color:var(--ink2);">Google</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div class="tc-logo" style="width:48px;height:48px;border-radius:12px;">
+          <img class="logo-img" src="logos/chatgpt.svg" alt="ChatGPT" style="width:30px;height:30px;">
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--ink);">OpenAI ChatGPT</div>
+          <div style="font-size:12px;color:var(--ink2);">OpenAI</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div class="tc-logo" style="width:48px;height:48px;border-radius:12px;">
+          <img class="logo-img" src="logos/claude.webp" alt="Claude" style="width:30px;height:30px;">
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--ink);">Anthropic Claude</div>
+          <div style="font-size:12px;color:var(--ink2);">Anthropic</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div class="tc-logo" style="width:48px;height:48px;border-radius:12px;">
+          <img class="logo-img" src="logos/Copilot.png" alt="Copilot" style="width:30px;height:30px;">
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--ink);">Microsoft Copilot</div>
+          <div style="font-size:12px;color:var(--ink2);">Microsoft</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ════════════  CODING AGENTS  ════════════ -->
+<section class="slide alt" id="s3">
+  <div class="eyebrow">Type Two — Coding Agents</div>
+  <h2>AI for Software Development</h2>
+
+  <div class="slide-split" style="display:flex; gap:60px; align-items:flex-start; flex-wrap:wrap; margin-bottom:36px;">
+
+    <!-- Description column -->
+    <div style="flex:1; min-width:280px; max-width:520px;">
+      <p style="font-size:1.05rem; color:var(--ink2); line-height:1.75; margin-bottom:20px;">
+        These tools go far beyond code suggestions. They read your entire codebase, write and edit files, run tests, fix failures, and open pull requests — autonomously. You describe a task; they do the work.
+      </p>
+      <p style="font-size:1.05rem; color:var(--ink2); line-height:1.75; margin-bottom:20px;">
+        They live in your terminal or IDE, not in a chat window. The interaction model is closer to delegating a task to a junior developer than to having a conversation.
+      </p>
+      <p style="font-size:1.05rem; color:var(--ink2); line-height:1.75;">
+        These are tools for software engineers. If you are not writing code yourself, the relevant question is: does your dev team have access to the right one?
+      </p>
+    </div>
+
+    <!-- Logo list column -->
+    <div style="flex:0 0 auto; display:flex; flex-direction:column; gap:12px; padding-top:4px;">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div class="tc-logo" style="width:48px;height:48px;border-radius:12px;">
+          <img class="logo-img" src="logos/antigravity.png" alt="Antigravity" style="width:30px;height:30px;">
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--ink);">Google Antigravity</div>
+          <div style="font-size:12px;color:var(--ink2);">Google</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div class="tc-logo" style="width:48px;height:48px;border-radius:12px;">
+          <img class="logo-img" src="logos/codex.webp" alt="Codex" style="width:30px;height:30px;">
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--ink);">OpenAI Codex</div>
+          <div style="font-size:12px;color:var(--ink2);">OpenAI</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div class="tc-logo" style="width:48px;height:48px;border-radius:12px;">
+          <img class="logo-img" src="logos/claude code.png" alt="Claude Code" style="width:30px;height:30px;">
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--ink);">Claude Code</div>
+          <div style="font-size:12px;color:var(--ink2);">Anthropic</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div class="tc-logo" style="width:48px;height:48px;border-radius:12px;">
+          <img class="logo-img" src="logos/cursor.svg" alt="Cursor" style="width:30px;height:30px;">
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--ink);">Cursor</div>
+          <div style="font-size:12px;color:var(--ink2);">Anysphere</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label">IBM Internal</div>
+  <div style="max-width:860px;">
+    <div class="ibm-feature-box" style="border:2px solid #0f62fe; border-radius:14px; background:#f0f6ff; padding:28px 32px;">
+
+      <div class="ibm-feature-inner" style="display:flex; gap:60px; align-items:flex-start; flex-wrap:wrap;">
+
+        <!-- Bob identity -->
+        <div class="bob-identity" style="flex:0 0 auto; display:flex; flex-direction:column; gap:16px; width:200px;">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <a href="https://bob.ibm.com/" target="_blank" rel="noopener" style="display:contents;">
+              <div class="tc-logo" style="width:48px;height:48px;border-radius:12px; cursor:pointer;">
+                <img class="logo-img" src="logos/bob.png" alt="IBM Bob" style="width:30px;height:30px;">
+              </div>
+            </a>
+            <div>
+              <div style="font-size:15px;font-weight:800;color:var(--ink);">IBM Bob</div>
+              <div style="font-size:12px;color:var(--ink2);">IBM</div>
+            </div>
+          </div>
+          <p style="font-size:13px;color:var(--ink2);line-height:1.6;">The <strong style="color:#0f62fe;">only AI coding agent approved</strong> for IBM internal product codebases. Works in your IDE and terminal. Your code and prompts are never used for training.</p>
+        </div>
+
+        <!-- What makes it different -->
+        <div class="bob-diff-grid" style="flex:1; min-width:260px;">
+          <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;color:#0f62fe;margin-bottom:14px;">What makes Bob different</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px 24px;">
+
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <span style="font-size:13px;font-weight:700;color:var(--ink);">IBM-approved for IBM IP</span>
+              <span style="font-size:12px;color:var(--ink2);">The only coding agent cleared for IBM product codebases — all others are explicitly prohibited.</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <span style="font-size:13px;font-weight:700;color:var(--ink);">Three specialised modes</span>
+              <span style="font-size:12px;color:var(--ink2);">Agent, Plan, and Ask — Bob switches between them autonomously as the task evolves.</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <span style="font-size:13px;font-weight:700;color:var(--ink);">Automatic model routing</span>
+              <span style="font-size:12px;color:var(--ink2);">Bob picks the right model for each task based on complexity, context, and cost — no manual selection needed.</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <span style="font-size:13px;font-weight:700;color:var(--ink);">Bobalytics</span>
+              <span style="font-size:12px;color:var(--ink2);">Org-level analytics for adoption, AI contribution ("Bob factor"), and spend — no equivalent exists elsewhere.</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <span style="font-size:13px;font-weight:700;color:var(--ink);">Built-in governance</span>
+              <span style="font-size:12px;color:var(--ink2);">Every interaction is logged and auditable, tied to IBM's enterprise controls — not a bolted-on policy layer.</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <span style="font-size:13px;font-weight:700;color:var(--ink);">Enterprise security</span>
+              <span style="font-size:12px;color:var(--ink2);">Code and prompts never leave IBM infrastructure and are never used for training — consumer tools can't say the same.</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <span style="font-size:13px;font-weight:700;color:var(--ink);">Legacy codebase refactoring</span>
+              <span style="font-size:12px;color:var(--ink2);">Built for large, complex enterprise codebases — modernise, migrate, and refactor at scale, not just greenfield projects.</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <span style="font-size:13px;font-weight:700;color:var(--ink);">AI ethics by design</span>
+              <span style="font-size:12px;color:var(--ink2);">Aligned with IBM's ethics principles — transparent, fair, and accountable output by default, not by configuration.</span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════  IBM TOOLS  ════════════ -->
+<section class="slide" id="s4">
+  <div class="eyebrow">IBM Internal — Types Two &amp; Three</div>
+  <h2>IBM's AI Tools</h2>
+  <p class="lead">Three purpose-built IBM tools — each with a distinct audience and use case.</p>
+
+  <div class="ibm-banner">
+    <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" fill="#1a56db" opacity=".2"/><rect x="3" y="11" width="18" height="11" rx="2" stroke="#1a56db" stroke-width="1.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="#1a56db" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="16" r="1.5" fill="#1a56db"/></svg>
+    <p><strong>These are IBM-internal tools.</strong> Data governance and IBM IP protection are built in from the ground up. They complement each other — use whichever fits the task.</p>
+  </div>
+
+  <div class="tool-row">
+
+    <a href="https://bob.ibm.com/" target="_blank" rel="noopener" class="tc" style="text-decoration:none;">
+      <div class="tc-top">
+        <div class="tc-logo" style="background:var(--bg); border-color:var(--border);">
+          <img class="logo-img" src="logos/bob.png" alt="IBM Bob">
+        </div>
+        <div><div class="tc-name">IBM Bob</div><div class="tc-maker">IBM</div></div>
+      </div>
+      <div class="tc-tagline">The coding agent for IBM software teams</div>
+      <div class="tc-desc">The only AI coding tool approved for IBM internal product codebases. Works in your IDE and terminal. Automatically routes to the right AI model per task.</div>
+      <div class="tc-chips"><span class="chip">IBM Governed</span><span class="chip">IDE + Terminal</span><span class="chip">Subagents</span><span class="chip">Skills</span></div>
+    </a>
+
+    <a href="https://servicesessentials.ibm.com/launchpad/" target="_blank" rel="noopener" class="tc" style="text-decoration:none;">
+      <div class="tc-top">
+        <div class="tc-logo" style="background:var(--bg); border-color:var(--border);">
+          <!-- ICA has no logo file — use styled text badge -->
+          <span style="font-size:9px;font-weight:900;color:#0f62fe;letter-spacing:0.04em;">ICA</span>
+        </div>
+        <div><div class="tc-name">IBM ICA</div><div class="tc-maker">IBM Consulting</div></div>
+      </div>
+      <div class="tc-tagline">IBM Consulting's central AI platform</div>
+      <div class="tc-desc">The web-based AI headquarters for IBM Consulting. Governed assistants, agents, and tools for every stage of a project — from advisory through delivery.</div>
+      <div class="tc-chips"><span class="chip">Consulting Assistants</span><span class="chip">Multi-Agent</span><span class="chip">Governed</span></div>
+    </a>
+
+    <a href="https://pages.github.ibm.com/ica-cowork-artifacts/roi-zahut/artifacts/art_4e7985ab.html#overview" target="_blank" rel="noopener" class="tc" style="text-decoration:none;">
+      <div class="tc-top">
+        <div class="tc-logo" style="background:var(--bg); border-color:var(--border);">
+          <img class="logo-img" src="logos/ICA edge.png" alt="ICA Edge">
+        </div>
+        <div><div class="tc-name">IBM ICA Edge</div><div class="tc-maker">IBM Consulting</div></div>
+      </div>
+      <div class="tc-tagline">ICA on your desktop — data stays local</div>
+      <div class="tc-desc">A secure desktop app running inside a sandboxed microVM on your laptop. Executes consulting tasks (RFPs, decks, BPMN flows) without sensitive data ever leaving your machine.</div>
+      <div class="tc-chips"><span class="chip">Desktop-Native</span><span class="chip">Data Stays Local</span><span class="chip">Consulting Skills</span><span class="chip">All Geos</span></div>
+    </a>
+
+  </div>
+
+  <div class="callout">
+    <strong>ICA vs. Bob in one sentence:</strong> ICA is for consultants building client deliverables. IBM Bob is for software engineers writing code.
+  </div>
+</section>
+
+
+<!-- ════════════  ENTERPRISE  ════════════ -->
+<section class="slide alt" id="s5">
+  <div class="eyebrow">Type Four — Enterprise AI Platforms</div>
+  <h2>Enterprise AI</h2>
+  <p class="lead">AI woven into the tools your organisation already uses. Gemini and Copilot both belong here — each tied to their respective productivity ecosystem.</p>
+
+  <div class="tool-row" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); max-width: 860px;">
+
+    <div class="tc">
+      <div class="tc-top">
+        <div class="tc-logo">
+          <img class="logo-img" src="logos/Copilot.png" alt="Microsoft Copilot">
+        </div>
+        <div><div class="tc-name">Microsoft Copilot</div><div class="tc-maker">Microsoft</div></div>
+      </div>
+      <div class="tc-tagline">AI built into Word, Excel, Outlook &amp; Teams</div>
+      <div class="tc-desc">Meets you inside your existing Microsoft 365 apps. Knows your calendar, emails, and org chart. Draft emails, summarise meetings, analyse spreadsheets — without switching tools.</div>
+      <div class="tc-chips"><span class="chip">Microsoft 365</span><span class="chip">Outlook / Teams</span><span class="chip">Org-aware</span></div>
+    </div>
+
+    <div class="tc">
+      <div class="tc-top">
+        <div class="tc-logo">
+          <img class="logo-img" src="logos/gemini.png" alt="Gemini">
+        </div>
+        <div><div class="tc-name">Google Gemini</div><div class="tc-maker">Google</div></div>
+      </div>
+      <div class="tc-tagline">AI built into Gmail, Docs &amp; Drive</div>
+      <div class="tc-desc">The natural enterprise choice for Google Workspace organisations. Embedded directly into Gmail, Docs, Sheets, and Meet — summarises, drafts, and analyses where your work already lives.</div>
+      <div class="tc-chips"><span class="chip">Google Workspace</span><span class="chip">Gmail / Meet</span><span class="chip">Multimodal</span></div>
+    </div>
+
+  </div>
+
+ 
+</section>
+
+
+<!-- ════════════  MATRIX  ════════════ -->
+<section class="slide" id="s6">
+  <div class="eyebrow">Side-by-Side</div>
+  <h2>Tool Comparison</h2>
+  <p class="lead">● Yes &nbsp;&nbsp; ◑ Partial &nbsp;&nbsp; — No</p>
+
+  <div class="matrix-wrap">
+    <table class="mx">
+      <thead>
+        <tr>
+          <th>Tool</th>
+          <th>Category</th>
+          <th>General Chat</th>
+          <th>Writes Code</th>
+          <th>Works Locally</th>
+          <th>Browser Automation</th>
+          <th>IBM Internal</th>
+          <th>Best for</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- ── Chat Assistants ── -->
+        <tr>
+          <td><div class="mx-tool"><div class="mx-logo"><img class="logo-img" src="logos/gemini.png" alt="Gemini"></div><div><div class="mx-name">Gemini</div><div class="mx-vendor">Google</div></div></div></td>
+          <td><span class="tc-badge b-chat">Chat AI</span><br><span class="tc-badge b-ent" style="margin-top:3px;display:inline-block;">Enterprise AI</span></td>
+          <td class="yes">●</td><td class="part">◑</td><td class="no">—</td><td class="no">—</td><td class="no">—</td>
+          <td style="font-size:12px;color:var(--ink2);">Google Workspace teams</td>
+        </tr>
+        <tr>
+          <td><div class="mx-tool"><div class="mx-logo"><img class="logo-img" src="logos/chatgpt.svg" alt="ChatGPT"></div><div><div class="mx-name">ChatGPT</div><div class="mx-vendor">OpenAI</div></div></div></td>
+          <td><span class="tc-badge b-chat">Chat AI</span></td>
+          <td class="yes">●</td><td class="part">◑</td><td class="no">—</td><td class="part">◑</td><td class="no">—</td>
+          <td style="font-size:12px;color:var(--ink2);">Reasoning, research, writing</td>
+        </tr>
+        <tr>
+          <td><div class="mx-tool"><div class="mx-logo"><img class="logo-img" src="logos/claude.webp" alt="Claude"></div><div><div class="mx-name">Claude</div><div class="mx-vendor">Anthropic</div></div></div></td>
+          <td><span class="tc-badge b-chat">Chat AI</span></td>
+          <td class="yes">●</td><td class="part">◑</td><td class="no">—</td><td class="part">◑</td><td class="no">—</td>
+          <td style="font-size:12px;color:var(--ink2);">Long docs, nuanced writing</td>
+        </tr>
+        <tr>
+          <td><div class="mx-tool"><div class="mx-logo"><img class="logo-img" src="logos/Copilot.png" alt="Copilot"></div><div><div class="mx-name">Copilot</div><div class="mx-vendor">Microsoft</div></div></div></td>
+          <td><span class="tc-badge b-chat">Chat AI</span><br><span class="tc-badge b-ent" style="margin-top:3px;display:inline-block;">Enterprise AI</span></td>
+          <td class="yes">●</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td class="no">—</td>
+          <td style="font-size:12px;color:var(--ink2);">Microsoft 365 organisations</td>
+        </tr>
+        <!-- ── Coding Agents ── -->
+        <tr>
+          <td><div class="mx-tool"><div class="mx-logo"><img class="logo-img" src="logos/antigravity.png" alt="Antigravity"></div><div><div class="mx-name">Antigravity</div><div class="mx-vendor">Google</div></div></div></td>
+          <td><span class="tc-badge b-dev">Coding Agent</span></td>
+          <td class="no">—</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td><td class="no">—</td>
+          <td style="font-size:12px;color:var(--ink2);">Google Cloud / Firebase</td>
+        </tr>
+        <tr>
+          <td><div class="mx-tool"><div class="mx-logo"><img class="logo-img" src="logos/codex.webp" alt="Codex"></div><div><div class="mx-name">Codex</div><div class="mx-vendor">OpenAI</div></div></div></td>
+          <td><span class="tc-badge b-dev">Coding Agent</span></td>
+          <td class="no">—</td><td class="yes">●</td><td class="no">—</td><td class="no">—</td><td class="no">—</td>
+          <td style="font-size:12px;color:var(--ink2);">Async cloud coding tasks</td>
+        </tr>
+        <tr>
+          <td><div class="mx-tool"><div class="mx-logo"><img class="logo-img" src="logos/claude code.png" alt="Claude Code"></div><div><div class="mx-name">Claude Code</div><div class="mx-vendor">Anthropic</div></div></div></td>
+          <td><span class="tc-badge b-dev">Coding Agent</span></td>
+          <td class="no">—</td><td class="yes">●</td><td class="yes">●</td><td class="part">◑</td><td class="no">—</td>
+          <td style="font-size:12px;color:var(--ink2);">Large local codebases</td>
+        </tr>
+        <tr>
+          <td><div class="mx-tool"><div class="mx-logo"><img class="logo-img" src="logos/cursor.svg" alt="Cursor"></div><div><div class="mx-name">Cursor</div><div class="mx-vendor">Anysphere</div></div></div></td>
+          <td><span class="tc-badge b-ide">AI IDE</span></td>
+          <td class="no">—</td><td class="yes">●</td><td class="yes">●</td><td class="part">◑</td><td class="no">—</td>
+          <td style="font-size:12px;color:var(--ink2);">Dev teams wanting model choice</td>
+        </tr>
+        <!-- ── IBM Internal ── -->
+        <tr class="ibm-row">
+          <td><a href="https://bob.ibm.com/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="mx-tool"><div class="mx-logo" style="background:var(--bg);border-color:var(--border);"><img class="logo-img" src="logos/bob.png" alt="IBM Bob"></div><div><div class="mx-name">IBM Bob</div><div class="mx-vendor">IBM</div></div></div></a></td>
+          <td><span class="tc-badge b-dev">Coding Agent</span></td>
+          <td class="no">—</td><td class="yes">●</td><td class="part">◑</td><td class="part">◑</td><td class="yes">●</td>
+          <td style="font-size:12px;color:var(--ink2);">IBM internal software dev</td>
+        </tr>
+        <tr class="ibm-row">
+          <td><a href="https://servicesessentials.ibm.com/launchpad/" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="mx-tool"><div class="mx-logo" style="background:var(--bg);border-color:var(--border);display:flex;align-items:center;justify-content:center;"><span style="font-size:7px;font-weight:900;color:#0f62fe;">ICA</span></div><div><div class="mx-name">IBM ICA</div><div class="mx-vendor">IBM Consulting</div></div></div></a></td>
+          <td><span class="tc-badge b-ent">IBM Consulting</span></td>
+          <td class="yes">●</td><td class="part">◑</td><td class="no">—</td><td class="part">◑</td><td class="yes">●</td>
+          <td style="font-size:12px;color:var(--ink2);">IBM Consulting delivery</td>
+        </tr>
+        <tr class="ibm-row">
+          <td><a href="https://pages.github.ibm.com/ica-cowork-artifacts/roi-zahut/artifacts/art_4e7985ab.html#overview" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"><div class="mx-tool"><div class="mx-logo" style="background:var(--bg);border-color:var(--border);"><img class="logo-img" src="logos/ICA edge.png" alt="ICA Edge"></div><div><div class="mx-name">ICA Edge</div><div class="mx-vendor">IBM Consulting</div></div></div></a></td>
+          <td><span class="tc-badge b-ent">IBM Consulting</span></td>
+          <td class="yes">●</td><td class="part">◑</td><td class="yes">●</td><td class="yes">●</td><td class="yes">●</td>
+          <td style="font-size:12px;color:var(--ink2);">Sensitive / offline consulting</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<!-- ════════════  WHEN TO USE  ════════════ -->
+<section class="slide alt" id="s7">
+  <div class="eyebrow">Decision Guide</div>
+  <h2>When to use which type</h2>
+  <p class="lead">Start with the task. Pick the category. Then choose the tool within it.</p>
+
+  <!-- ── Part 1: General category guide ── -->
+  <div class="section-label" style="margin-bottom:14px;">By task type — general guidance</div>
+  <div class="dg-grid" style="margin-bottom:36px;">
+
+    <div class="dg-row">
+      <div class="dg-if">Writing, research, or brainstorming</div>
+      <div class="dg-then">
+        <span style="font-size:11px;font-weight:700;background:#dbeafe;color:#1e3a8a;border-radius:6px;padding:3px 9px;white-space:nowrap;">Chat Assistant</span>
+        Conversational, broad knowledge — no setup needed
+      </div>
+    </div>
+
+    <div class="dg-row">
+      <div class="dg-if">Summarising or analysing long documents</div>
+      <div class="dg-then">
+        <span style="font-size:11px;font-weight:700;background:#dbeafe;color:#1e3a8a;border-radius:6px;padding:3px 9px;white-space:nowrap;">Chat Assistant</span>
+        Paste or upload the document and ask questions directly
+      </div>
+    </div>
+
+    <div class="dg-row">
+      <div class="dg-if">Writing, editing, or reviewing code</div>
+      <div class="dg-then">
+        <span style="font-size:11px;font-weight:700;background:#ede9fe;color:#4c1d95;border-radius:6px;padding:3px 9px;white-space:nowrap;">Coding Agent</span>
+        Works across your full codebase — not just a single file
+      </div>
+    </div>
+
+    <div class="dg-row">
+      <div class="dg-if">Fixing bugs or running tests autonomously</div>
+      <div class="dg-then">
+        <span style="font-size:11px;font-weight:700;background:#ede9fe;color:#4c1d95;border-radius:6px;padding:3px 9px;white-space:nowrap;">Coding Agent</span>
+        Delegate end-to-end — it reads, edits, runs, and iterates
+      </div>
+    </div>
+
+    <div class="dg-row">
+      <div class="dg-if">AI inside emails, docs, or spreadsheets</div>
+      <div class="dg-then">
+        <span style="font-size:11px;font-weight:700;background:#fef3c7;color:#78350f;border-radius:6px;padding:3px 9px;white-space:nowrap;">Enterprise Platform</span>
+        AI is woven into the tool you already have open
+      </div>
+    </div>
+
+    <div class="dg-row">
+      <div class="dg-if">Meeting notes, action items, and recaps</div>
+      <div class="dg-then">
+        <span style="font-size:11px;font-weight:700;background:#fef3c7;color:#78350f;border-radius:6px;padding:3px 9px;white-space:nowrap;">Enterprise Platform</span>
+        Your calendar and meeting tools are already connected
+      </div>
+    </div>
+
+    <div class="dg-row">
+      <div class="dg-if">Drafting a presentation or proposal</div>
+      <div class="dg-then">
+        <span style="font-size:11px;font-weight:700;background:#fef3c7;color:#78350f;border-radius:6px;padding:3px 9px;white-space:nowrap;">Enterprise Platform</span>
+        <span style="color:var(--ink2);">or</span>
+        <span style="font-size:11px;font-weight:700;background:#dbeafe;color:#1e3a8a;border-radius:6px;padding:3px 9px;white-space:nowrap;">Chat Assistant</span>
+        — use whichever is already in your workflow.
+        <span style="color:var(--ink2);">If you're at IBM,</span>
+        <a href="https://bob.ibm.com/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;text-decoration:none;flex-shrink:0;">
+          <div class="dg-logo" style="background:var(--bg);border-color:var(--border);cursor:pointer;"><img class="logo-img" src="logos/bob.png" alt="IBM Bob"></div>
+          <strong style="color:var(--ink);">IBM Bob</strong>
+        </a>
+        <span style="color:var(--ink2);">can generate HTML/CSS/JS artifacts directly.</span>
+      </div>
+    </div>
+
+    <div class="dg-row">
+      <div class="dg-if">Refactoring or migrating a legacy codebase</div>
+      <div class="dg-then">
+        <span style="font-size:11px;font-weight:700;background:#ede9fe;color:#4c1d95;border-radius:6px;padding:3px 9px;white-space:nowrap;">Coding Agent</span>
+        Needs deep multi-file context — chat tools won't cut it
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Part 2: IBM-specific guide ── -->
+  <div class="section-label" style="margin-bottom:14px;">IBM tools — when to use which</div>
+  <div style="display:flex; flex-direction:column; gap:10px; max-width:100%;">
+
+    <div style="display:flex; align-items:stretch; background:var(--white); border:1.5px solid #c7d7fd; border-radius:12px; overflow:hidden;">
+      <div style="background:#edf3ff; padding:16px 18px; font-size:13.5px; font-weight:600; color:var(--ink); min-width:200px; max-width:220px; flex-shrink:0; display:flex; align-items:center; border-right:1.5px solid #c7d7fd; line-height:1.4;">Writing or reviewing IBM code</div>
+      <div style="padding:14px 18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:13px; color:var(--ink2); line-height:1.5;">
+        <a href="https://bob.ibm.com/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0;">
+          <div class="dg-logo" style="background:var(--bg);border-color:var(--border);cursor:pointer;"><img class="logo-img" src="logos/bob.png" alt="IBM Bob"></div>
+          <strong style="color:var(--ink);">IBM Bob</strong>
+        </a>
+        — the only coding agent approved for IBM product codebases. All others are prohibited.
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:stretch; background:var(--white); border:1.5px solid #c7d7fd; border-radius:12px; overflow:hidden;">
+      <div style="background:#edf3ff; padding:16px 18px; font-size:13.5px; font-weight:600; color:var(--ink); min-width:200px; max-width:220px; flex-shrink:0; display:flex; align-items:center; border-right:1.5px solid #c7d7fd; line-height:1.4;">IBM consulting deliverable (deck, RFP, SOW)</div>
+      <div style="padding:14px 18px; display:flex; align-items:center; gap:16px; flex-wrap:wrap; font-size:13px; color:var(--ink2); line-height:1.5;">
+        <a href="https://servicesessentials.ibm.com/launchpad/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0;">
+          <div class="dg-logo" style="background:var(--bg);border-color:var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;"><span style="font-size:7px;font-weight:900;color:#0f62fe;">ICA</span></div>
+          <strong style="color:var(--ink);">IBM ICA 2.0</strong>
+        </a>
+        — cloud-based, for collaborative delivery work;
+        <a href="https://pages.github.ibm.com/ica-cowork-artifacts/roi-zahut/artifacts/art_4e7985ab.html#overview" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0;">
+          <div class="dg-logo" style="background:var(--bg);border-color:var(--border);cursor:pointer;"><img class="logo-img" src="logos/ICA edge.png" alt="ICA Edge"></div>
+          <strong style="color:var(--ink);">ICA Edge</strong>
+        </a>
+        — offline, data never leaves your laptop.
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:stretch; background:var(--white); border:1.5px solid #c7d7fd; border-radius:12px; overflow:hidden;">
+      <div style="background:#edf3ff; padding:16px 18px; font-size:13.5px; font-weight:600; color:var(--ink); min-width:200px; max-width:220px; flex-shrink:0; display:flex; align-items:center; border-right:1.5px solid #c7d7fd; line-height:1.4;">Sensitive client data or fully offline work</div>
+      <div style="padding:14px 18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:13px; color:var(--ink2); line-height:1.5;">
+        <a href="https://pages.github.ibm.com/ica-cowork-artifacts/roi-zahut/artifacts/art_4e7985ab.html#overview" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0;">
+          <div class="dg-logo" style="background:var(--bg);border-color:var(--border);cursor:pointer;"><img class="logo-img" src="logos/ICA edge.png" alt="ICA Edge"></div>
+          <strong style="color:var(--ink);">ICA Edge</strong>
+        </a>
+        — sandboxed microVM on your device, nothing leaves your machine under any circumstances.
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:stretch; background:var(--white); border:1.5px solid #c7d7fd; border-radius:12px; overflow:hidden;">
+      <div style="background:#edf3ff; padding:16px 18px; font-size:13.5px; font-weight:600; color:var(--ink); min-width:200px; max-width:220px; flex-shrink:0; display:flex; align-items:center; border-right:1.5px solid #c7d7fd; line-height:1.4;">Multi-step consulting workflows &amp; team collaboration</div>
+      <div style="padding:14px 18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:13px; color:var(--ink2); line-height:1.5;">
+        <a href="https://servicesessentials.ibm.com/launchpad/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0;">
+          <div class="dg-logo" style="background:var(--bg);border-color:var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;"><span style="font-size:7px;font-weight:900;color:#0f62fe;">ICA</span></div>
+          <strong style="color:var(--ink);">IBM ICA 2.0</strong>
+        </a>
+        — governed agents, assistants, and shared knowledge base for the full project lifecycle.
+      </div>
+    </div>
+
+    <div style="display:flex; align-items:stretch; background:var(--white); border:1.5px solid #c7d7fd; border-radius:12px; overflow:hidden;">
+      <div style="background:#edf3ff; padding:16px 18px; font-size:13.5px; font-weight:600; color:var(--ink); min-width:200px; max-width:220px; flex-shrink:0; display:flex; align-items:center; border-right:1.5px solid #c7d7fd; line-height:1.4;">General IBM chat assistance &amp; knowledge queries</div>
+      <div style="padding:14px 18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:13px; color:var(--ink2); line-height:1.5;">
+        <a href="https://servicesessentials.ibm.com/launchpad/" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0;">
+          <div class="dg-logo" style="background:var(--bg);border-color:var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;"><span style="font-size:7px;font-weight:900;color:#0f62fe;">ICA</span></div>
+          <strong style="color:var(--ink);">IBM ICA 2.0</strong>
+        </a>
+        — IBM's governed chat assistant, connected to IBM knowledge, fully auditable.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════  HOW I MADE THIS  ════════════ -->
+<section class="slide alt" id="s9">
+  <div class="eyebrow">Behind the Scenes</div>
+  <h2>How I made this presentation</h2>
+  <p class="lead">Three steps — gather context, write one prompt, then refine with Bob until it's right.</p>
+
+  <!-- Step 1 -->
+  <div style="display:flex; flex-direction:column; gap:20px; max-width:900px;">
+
+    <div style="display:flex; gap:0; align-items:stretch; background:var(--white); border:1.5px solid var(--border); border-radius:14px; overflow:hidden;">
+      <div style="background:var(--ink); color:#fff; padding:20px 22px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; flex-shrink:0; width:54px; gap:6px; padding-top:22px;">
+        <span style="font-size:18px; font-weight:900; line-height:1;">1</span>
+      </div>
+      <div style="padding:20px 24px; flex:1;">
+        <div style="font-size:15px; font-weight:800; color:var(--ink); margin-bottom:6px;">Gather context and data</div>
+        <p style="font-size:13px; color:var(--ink2); line-height:1.65; margin-bottom:14px;">I gathered links to all documentation sites for the different AI tools, as well as IBM documentation that I placed in the working folder locally — because Bob cannot access links that require an IBM w3ID login.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:6px;">
+          <a href="https://antigravity.google/docs/" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">antigravity.google/docs</a>
+          <a href="https://antigravity.google/" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">antigravity.google</a>
+          <a href="https://openai.com/codex/" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">openai.com/codex</a>
+          <a href="https://learn.chatgpt.com/docs?site_locale=en" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">learn.chatgpt.com/docs</a>
+          <a href="https://code.claude.com/docs/en/overview" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">code.claude.com/docs</a>
+          <a href="https://claude.com/product/claude-code" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">claude.com/product/claude-code</a>
+          <a href="https://cursor.com/" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">cursor.com</a>
+          <a href="https://cursor.com/docs" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">cursor.com/docs</a>
+          <a href="https://bob.ibm.com/" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">bob.ibm.com</a>
+          <a href="https://bob.ibm.com/docs/ide" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">bob.ibm.com/docs/ide</a>
+          <a href="https://claude.com/product/overview" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">claude.com/product/overview</a>
+          <a href="https://openai.com/index/chatgpt/" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">openai.com/chatgpt</a>
+          <a href="https://learn.chatgpt.com/docs" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">learn.chatgpt.com/docs</a>
+          <a href="https://gemini.google/overview/" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">gemini.google/overview</a>
+          <a href="https://gemini.google/about/" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">gemini.google/about</a>
+          <a href="https://learn.microsoft.com/en-us/microsoft-365/copilot/microsoft-365-copilot-overview" target="_blank" rel="noopener" style="font-size:11.5px;color:var(--accent);text-decoration:none;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">learn.microsoft.com — Copilot overview</a>
+          <span style="font-size:11.5px;color:var(--ink2);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px 9px;white-space:nowrap;">+ IBM ICA &amp; ICA Edge docs (placed locally in repo)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div style="display:flex; gap:0; align-items:stretch; background:var(--white); border:1.5px solid var(--border); border-radius:14px; overflow:hidden;">
+      <div style="background:var(--ink); color:#fff; padding:20px 22px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; flex-shrink:0; width:54px; gap:6px; padding-top:22px;">
+        <span style="font-size:18px; font-weight:900; line-height:1;">2</span>
+      </div>
+      <div style="padding:20px 24px; flex:1;">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; flex-wrap:wrap;">
+          <div style="font-size:15px; font-weight:800; color:var(--ink);">Construct and run prompt in Bob</div>
+          <button id="prompt-copy-btn" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;transition:background 0.15s;">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 11H2.5A1.5 1.5 0 011 9.5v-7A1.5 1.5 0 012.5 1h7A1.5 1.5 0 0111 2.5V3" stroke="currentColor" stroke-width="1.5"/></svg>
+            Copy prompt
+          </button>
+        </div>
+        <div style="background:var(--bg); border:1.5px solid var(--border); border-radius:10px; padding:16px 18px; font-size:13px; color:var(--ink2); line-height:1.7; font-style:italic;" id="prompt-text-display">
+          "Hey Bob, I am going to do a 1–1.5 hour presentation for my colleagues on AI tools and their purpose as well as how they can and should be used. The presentation should touch on and compare the following tools: Google Antigravity, Google Gemini, OpenAI ChatGPT, OpenAI Codex, Anthropic Claude, Anthropic Claude Code, Cursor, IBM Bob, IBM ICA / ICA Edge, Microsoft Copilot.
+          <br><br>
+          Will you please create an HTML file that I can use to present this. The file should outline each tool very briefly in a nice overview and also showcase a sort of matrix or chart where tools used for the same purpose are lumped together. The results for the audience should be a clear understanding of how the tool categories differ and when to use what kind of AI tool. It should also, in a nice and neat way, touch on the differences / advantages / strengths when comparing tools in the same category.
+          <br><br>
+          I have found some links with documentation and overviews of the different tools to get you started on a nice knowledge foundation. I've also placed some documentation for ICA and ICA Edge in this repo since the documentation sites for these internal IBM tools require you to log in with an IBM w3ID, but now you have access to it locally in the repo.
+          <br><br>
+          Please take your time. You have a lot of documentation to go through to make sure what you place in the presentation HTML is factual. Make sure the information you use for non-IBM tools comes from the official docs and sources for that tool. Make sure you are thorough and deliberate."
+        </div>
+        <script>
+          (function() {
+            var btn = document.getElementById('prompt-copy-btn');
+            var promptText = "Hey Bob, I am going to do a 1\u20131.5 hour presentation for my colleagues on AI tools and their purpose as well as how they can and should be used. The presentation should touch on and compare the following tools: Google Antigravity, Google Gemini, OpenAI ChatGPT, OpenAI Codex, Anthropic Claude, Anthropic Claude Code, Cursor, IBM Bob, IBM ICA / ICA Edge, Microsoft Copilot.\n\nWill you please create an HTML file that I can use to present this. The file should outline each tool very briefly in a nice overview and also showcase a sort of matrix or chart where tools used for the same purpose are lumped together. The results for the audience should be a clear understanding of how the tool categories differ and when to use what kind of AI tool. It should also, in a nice and neat way, touch on the differences / advantages / strengths when comparing tools in the same category.\n\nI have found some links with documentation and overviews of the different tools to get you started on a nice knowledge foundation. I've also placed some documentation for ICA and ICA Edge in this repo since the documentation sites for these internal IBM tools require you to log in with an IBM w3ID, but now you have access to it locally in the repo.\n\nPlease take your time. You have a lot of documentation to go through to make sure what you place in the presentation HTML is factual. Make sure the information you use for non-IBM tools comes from the official docs and sources for that tool. Make sure you are thorough and deliberate.";
+            btn.addEventListener('click', function() {
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(promptText).then(function() {
+                  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Copied!';
+                  btn.style.background = '#059669';
+                  setTimeout(function() {
+                    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 11H2.5A1.5 1.5 0 011 9.5v-7A1.5 1.5 0 012.5 1h7A1.5 1.5 0 0111 2.5V3" stroke="currentColor" stroke-width="1.5"/></svg> Copy prompt';
+                    btn.style.background = '';
+                  }, 2000);
+                });
+              } else {
+                var ta = document.createElement('textarea');
+                ta.value = promptText;
+                ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Copied!';
+                btn.style.background = '#059669';
+                setTimeout(function() {
+                  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="5" y="5" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 11H2.5A1.5 1.5 0 011 9.5v-7A1.5 1.5 0 012.5 1h7A1.5 1.5 0 0111 2.5V3" stroke="currentColor" stroke-width="1.5"/></svg> Copy prompt';
+                  btn.style.background = '';
+                }, 2000);
+              }
+            });
+          })();
+        </script>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div style="display:flex; gap:0; align-items:stretch; background:var(--white); border:1.5px solid var(--border); border-radius:14px; overflow:hidden;">
+      <div style="background:var(--ink); color:#fff; padding:20px 22px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; flex-shrink:0; width:54px; gap:6px; padding-top:22px;">
+        <span style="font-size:18px; font-weight:900; line-height:1;">3</span>
+      </div>
+      <div style="padding:20px 24px; flex:1;">
+        <div style="font-size:15px; font-weight:800; color:var(--ink); margin-bottom:6px;">First draft</div>
+        <p style="font-size:13px; color:var(--ink2); line-height:1.65; margin-bottom:10px;">Bob produced a fully working HTML presentation from a single prompt. Here's what the first draft looked like — before any refinement.</p>
+        <a href="https://dkdanielbeck.github.io/arla-bob-demo-first-draft/" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--accent);text-decoration:none;background:#eff4ff;border:1.5px solid #c7d7fd;border-radius:8px;padding:7px 14px;transition:background 0.15s;" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff4ff'">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6 3H3a1 1 0 00-1 1v9a1 1 0 001 1h9a1 1 0 001-1v-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M9 2h5m0 0v5m0-5L8 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          View first draft →
+        </a>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div style="display:flex; gap:0; align-items:stretch; background:var(--white); border:1.5px solid var(--border); border-radius:14px; overflow:hidden;">
+      <div style="background:var(--ink); color:#fff; padding:20px 22px; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; flex-shrink:0; width:54px; gap:6px; padding-top:22px;">
+        <span style="font-size:18px; font-weight:900; line-height:1;">4</span>
+      </div>
+      <div style="padding:20px 24px; flex:1;">
+        <div style="font-size:15px; font-weight:800; color:var(--ink); margin-bottom:6px;">Refine</div>
+        <p style="font-size:13px; color:var(--ink2); line-height:1.65;">Tell Bob what you want to change → Bob changes → repeat until you are satisfied.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════  GITHUB PAGES HOW-TO  ════════════ -->
+<section class="slide" id="s10">
+  <div class="eyebrow">Hands-On — Build &amp; Ship</div>
+  <h2>Deploy with Bob &amp; GitHub Pages</h2>
+  <p class="lead">From prompt to live website in under five minutes — no server, no build pipeline, no cost.</p>
+
+  <ol style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:12px; max-width:740px;">
+
+    <li style="display:flex; gap:18px; align-items:flex-start; background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:16px 20px;">
+      <span style="flex-shrink:0; width:28px; height:28px; border-radius:50%; background:var(--accent); color:#fff; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:1px;">1</span>
+      <span style="font-size:14px; color:var(--ink); line-height:1.6;">Have IBM Bob generate the app using <strong>HTML, CSS, and JavaScript</strong>.</span>
+    </li>
+
+    <li style="display:flex; gap:18px; align-items:flex-start; background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:16px 20px;">
+      <span style="flex-shrink:0; width:28px; height:28px; border-radius:50%; background:var(--accent); color:#fff; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:1px;">2</span>
+      <span style="font-size:14px; color:var(--ink); line-height:1.6;">Ensure the main file saved to your computer is named <code style="font-size:12.5px; background:#e8edf8; color:#1e3a8a; border-radius:5px; padding:1px 7px; font-family:'SF Mono','Fira Code',monospace;">index.html</code>.</span>
+    </li>
+
+    <li style="display:flex; gap:18px; align-items:flex-start; background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:16px 20px;">
+      <span style="flex-shrink:0; width:28px; height:28px; border-radius:50%; background:var(--accent); color:#fff; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:1px;">3</span>
+      <span style="font-size:14px; color:var(--ink); line-height:1.6;">Create a new <strong>public repository</strong> on GitHub.</span>
+    </li>
+
+    <li style="display:flex; gap:18px; align-items:flex-start; background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:16px 20px;">
+      <span style="flex-shrink:0; width:28px; height:28px; border-radius:50%; background:var(--accent); color:#fff; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:1px;">4</span>
+      <span style="font-size:14px; color:var(--ink); line-height:1.6;">Click <strong>uploading an existing file</strong> on the quick setup page and drag-and-drop your <code style="font-size:12.5px; background:#e8edf8; color:#1e3a8a; border-radius:5px; padding:1px 7px; font-family:'SF Mono','Fira Code',monospace;">index.html</code> file into the browser.</span>
+    </li>
+
+    <li style="display:flex; gap:18px; align-items:flex-start; background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:16px 20px;">
+      <span style="flex-shrink:0; width:28px; height:28px; border-radius:50%; background:var(--accent); color:#fff; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:1px;">5</span>
+      <span style="font-size:14px; color:var(--ink); line-height:1.6;">Click <strong>Commit changes</strong> to upload the file.</span>
+    </li>
+
+    <li style="display:flex; gap:18px; align-items:flex-start; background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:16px 20px;">
+      <span style="flex-shrink:0; width:28px; height:28px; border-radius:50%; background:var(--accent); color:#fff; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:1px;">6</span>
+      <span style="font-size:14px; color:var(--ink); line-height:1.6;">Go to the repository <strong>Settings</strong>, then click <strong>Pages</strong> in the left sidebar.</span>
+    </li>
+
+    <li style="display:flex; gap:18px; align-items:flex-start; background:var(--bg); border:1.5px solid var(--border); border-radius:12px; padding:16px 20px;">
+      <span style="flex-shrink:0; width:28px; height:28px; border-radius:50%; background:var(--accent); color:#fff; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:1px;">7</span>
+      <span style="font-size:14px; color:var(--ink); line-height:1.6;">Under <em>"Build and deployment,"</em> verify the branch is set to <strong>main</strong>. &nbsp;<span style="font-size:10.5px; font-weight:700; background:#e0f2fe; color:#0369a1; border-radius:5px; padding:2px 7px; letter-spacing:0.05em;">PNG</span></span>
+    </li>
+
+    <li style="display:flex; gap:18px; align-items:flex-start; background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:12px; padding:16px 20px;">
+      <span style="flex-shrink:0; width:28px; height:28px; border-radius:50%; background:#059669; color:#fff; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; margin-top:1px;">8</span>
+      <span style="font-size:14px; color:#14532d; line-height:1.6;">Wait a minute, refresh the page, and <strong>click your new live website link</strong>. 🎉</span>
+    </li>
+
+  </ol>
+</section>
+
+<!-- ════════════  QUICK LINKS  ════════════ -->
+<section class="slide alt" id="s11">
+  <div class="eyebrow">Quick Reference</div>
+  <h2>Key Links</h2>
+  <p class="lead">All the essential tools in one place. Hit the copy button to grab the full list and share it.</p>
+
+  <div class="ql-box">
+    <textarea class="ql-textarea" id="ql-content" readonly rows="18">── AI & IBM Consulting Tools — Quick Links ──
+
+IBM Bob (Coding Agent — IBM Approved)
+https://bob.ibm.com/
+
+IBM ICA 2.0 (IBM Consulting AI Platform)
+https://servicesessentials.ibm.com/launchpad/
+
+IBM ICA Edge (Private, On-Device AI — Data Never Leaves Your Laptop)
+https://pages.github.ibm.com/ica-cowork-artifacts/roi-zahut/artifacts/art_4e7985ab.html#overview
+
+IBM GitHub (Use for ALL official IBM work and client-facing projects)
+https://github.ibm.com/
+
+Personal GitHub (For personal side-projects and self-hosted pages only)
+https://github.com/
+
+─────────────────────────────────────────────
+⚠️  IMPORTANT — GitHub Usage Policy:
+Personal GitHub (github.com) is great for housing and hosting your own
+personal projects, portfolios, and learning experiments. However, if you
+are working in any official IBM capacity — client delivery, internal
+tooling, IBM-branded work, or anything under an IBM engagement — you
+MUST use an IBM GitHub account (github.ibm.com) to ensure proper data
+governance, IP protection, and compliance.
+─────────────────────────────────────────────</textarea>
+    <div class="ql-divider"></div>
+    <button class="ql-copy-btn" id="ql-copy-btn">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="5" y="5" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M3 11H2.5A1.5 1.5 0 011 9.5v-7A1.5 1.5 0 012.5 1h7A1.5 1.5 0 0111 2.5V3" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      Copy All Links
+    </button>
+  </div>
+
+  <script>
+    (function() {
+      var btn = document.getElementById('ql-copy-btn');
+      var ta  = document.getElementById('ql-content');
+      btn.addEventListener('click', function() {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(ta.value).then(function() {
+            btn.textContent = '✓  Copied!';
+            btn.classList.add('copied');
+            setTimeout(function() {
+              btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 11H2.5A1.5 1.5 0 011 9.5v-7A1.5 1.5 0 012.5 1h7A1.5 1.5 0 0111 2.5V3" stroke="currentColor" stroke-width="1.5"/></svg> Copy All Links';
+              btn.classList.remove('copied');
+            }, 2000);
+          });
+        } else {
+          ta.select();
+          document.execCommand('copy');
+          btn.textContent = '✓  Copied!';
+          btn.classList.add('copied');
+          setTimeout(function() {
+            btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="5" y="5" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M3 11H2.5A1.5 1.5 0 011 9.5v-7A1.5 1.5 0 012.5 1h7A1.5 1.5 0 0111 2.5V3" stroke="currentColor" stroke-width="1.5"/></svg> Copy All Links';
+            btn.classList.remove('copied');
+          }, 2000);
+        }
+      });
+    })();
+  </script>
+</section>
+
+</body>
+</html>
